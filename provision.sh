@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#stop on error
+#set -e
+
+echo "Define some variables"
+DBPASSWD=123456
+
 echo "Prepare folders..."
 
 echo "Create apps folder under home for all installed apps"
@@ -12,8 +18,40 @@ sudo apt-get remove -y --purge libreoffice*
 sudo apt-get -y clean
 sudo apt-get -y autoremove
 
-echo "To remove firefox:"
-sudo apt-get purge firefox firefox-globalmenu -y
+#echo "To remove firefox:"
+#sudo apt-get purge firefox firefox-globalmenu -y
+
+#echo "Install google chrome..."
+
+#wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+#sudo sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+
+#sudo apt-get update
+#sudo apt-get install google-chrome-stable -y
+
+#echo "Remove the added google list"
+#sudo rm -rf /etc/apt/sources.list.d/google.list
+
+
+
+echo "Install java8"
+echo "If it hangs at setting grub-pc, please run:"
+echo "sudo dpkg --configure -a"
+echo "After restart the vagrant with no provision(comment it out) and vagrant ssh "
+
+sudo add-apt-repository -y ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get -y upgrade
+echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
+sudo apt-get -y install oracle-java8-installer
+
+#echo "Install netbeans 8.2 at /home/apps/, this has to be done in GUI"
+
+#wget download.netbeans.org/netbeans/8.2/final/bundles/netbeans-8.2-linux.sh
+#chmod +x netbeans-8.2-linux.sh
+#./netbeans-8.2-linux.sh --javahome /usr/lib/jvm/java-8-oracle 
+
 
 
 echo "Install apache server..."
@@ -43,55 +81,75 @@ update-alternatives --config Test1
 echo "Remove the test folder"
 rm -rf /vagrant/shared/wwwroot/Test1
 
-echo "Install java8"
-echo "If it hangs at setting grub-pc, please run:"
-echo "sudo dpkg --configure -a"
-echo "After restart the vagrant with no provision(comment it out) and vagrant ssh "
 
-sudo add-apt-repository -y ppa:webupd8team/java
-sudo apt-get update
-sudo apt-get -y upgrade
-echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
-echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
-sudo apt-get -y install oracle-java8-installer
+echo "Install php5, to verify type"
+echo "php -v"
 
-#echo "Install netbeans 8.2 at /home/apps/"
+sudo apt-get -y install php5
 
-#wget download.netbeans.org/netbeans/8.2/final/bundles/netbeans-8.2-linux.sh
-#chmod +x netbeans-8.2-linux.sh
-#./netbeans-8.2-linux.sh --javahome /usr/lib/jvm/java-8-oracle 
 
-echo "Install google chrome..."
-
-wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
-sudo sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-
-sudo apt-get update
-sudo apt-get install google-chrome-stable -y
-
-echo "Remove the added google list"
-sudo rm -rf /etc/apt/sources.list.d/google.list
 
 echo "Install mysql server "
 echo "Issuing "
 echo "mysqladmin -u root -p version"
 echo "To see if it is working or not" 
-debconf-set-selections <<< 'mysql-server mysql-server/root_password password 123456'
-debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password 123456'
-apt-get update
-apt-get install -y mysql-server
+debconf-set-selections <<< 'mysql-server mysql-server/root_password password $DBPASSWD'
+debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password $DBPASSWD'
 
-#echo "Install php7, to verify type"
-#echo "php -v"
+sudo apt-get install -y mysql-server
+sudo apt-get install -y php5-mysql
 
-#sudo add-apt-repository ppa:ondrej/php	
-#sudo apt-get update
-#sudo apt-get -y install php7.0-cli php7.0-common libapache2-mod-php7.0 php7.0 php7.0-mysql php7.0-fpm php7.0-curl 
+sudo service apache2 restart
 
-#echo "Install phpmyadmin, to verify type in browser"
-#echo "http://localhost/phpmyadmin/"
-#sudo apt-get -y install phpmyadmin
+echo "Install phpmyadmin, to verify type in browser"
+echo "http://localhost/phpmyadmin/"
 
+debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
+debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password $DBPASSWD"
+debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password $DBPASSWD"
+debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password $DBPASSWD"
+debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect none"
+
+sudo apt-get -y install phpmyadmin
+
+echo "Install xdebug..."
+echo "The actuall version of xdebug will be echoed in console"
+
+sudo apt-get -y install php5-dev php-pear
+sudo pecl install xdebug
+
+echo "Modify the config file for php.ini or dir for additional .ini files , find its place at http://localhost/index.php"
+echo "Please manually add following to xdebug.ini to above dir "
+echo "; xdebug debugger"
+echo "zend_extension='/usr/lib/php5/20121212/xdebug.so'"
+echo "xdebug.remote_enable = 1"
+echo "xdebug.remote_connect_back = 1"
+
+
+echo "Install git and git gui"
+sudo apt-get -y install git
+sudo apt-get -y install git-gui
+
+echo "Install nodejs 7, run node or nodejs -v to check versions "
+curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+echo "Install R "
+	
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
+gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9
+gpg -a --export E084DAB9 | sudo apt-key add -
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get -y install r-base-dev
+
+echo "Install maven"
+sudo apt-get -y install maven	
+
+
+echo "Finished installing modules automatically,"
+echo "If there was a problem, please issue following..."
+echo "sudo apt-get --purge remove XXXXXX"
 
 
 
