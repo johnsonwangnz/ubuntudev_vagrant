@@ -146,6 +146,10 @@ sudo apt-get -y install r-base-dev
 echo "Install maven"
 sudo apt-get -y install maven	
 
+echo "Install docker :"
+echo "Issuing following to check docker version"
+echo "sudo docker --version"
+sudo wget -qO- https://get.docker.com/ | sh
 
 echo "Finished installing modules automatically,"
 echo "If there was a problem, please issue following..."
