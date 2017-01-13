@@ -151,6 +151,19 @@ echo "Issuing following to check docker version"
 echo "sudo docker --version"
 sudo wget -qO- https://get.docker.com/ | sh
 
+echo "Install docker composer"
+echo "Add current user to docker group"
+
+sudo usermod -aG docker $(whoami)
+
+echo "Install Python-pip"
+sudo apt-get -y install python-pip
+
+echo "Install docker-compose"
+echo "Verify : docker-compose --version"
+sudo pip install docker-compose 
+ 
+
 echo "Finished installing modules automatically,"
 echo "If there was a problem, please issue following..."
 echo "sudo apt-get --purge remove XXXXXX"
