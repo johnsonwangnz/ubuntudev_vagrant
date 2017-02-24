@@ -158,6 +158,7 @@ echo "; xdebug debugger"
 echo "zend_extension='/usr/lib/php5/20121212/xdebug.so'"
 echo "xdebug.remote_enable = 1"
 echo "xdebug.remote_connect_back = 1"
+echo "after that restart apache server: service apache2 restart"
 
 
 echo "Install git and git gui"
