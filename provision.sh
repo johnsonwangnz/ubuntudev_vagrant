@@ -29,6 +29,8 @@ sudo apt-get remove -y --purge libreoffice*
 sudo apt-get -y clean
 sudo apt-get -y autoremove
 
+echo "To install full vim"
+sudo apt-get -y install vim
 #echo "To remove firefox:"
 #sudo apt-get purge firefox firefox-globalmenu -y
 
@@ -48,7 +50,6 @@ echo "Install java8"
 echo "If it hangs at setting grub-pc, please run:"
 echo "sudo dpkg --configure -a"
 echo "After restart the vagrant with no provision(comment it out) and vagrant ssh "
-
 sudo add-apt-repository -y ppa:webupd8team/java
 sudo apt-get update
 sudo apt-get -y upgrade
@@ -57,8 +58,8 @@ echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-se
 sudo apt-get -y install oracle-java8-installer
 
 #echo "Install netbeans 8.2 at /home/apps/, this has to be done in GUI"
-echo "Must change java home as netbeans installer does not detect "
-echo "The default place it is installed to is /usr/local/netbeans-8.2"
+#echo "Must change java home as netbeans installer does not detect "
+#echo "The default place it is installed to is /usr/local/netbeans-8.2"
 #wget download.netbeans.org/netbeans/8.2/final/bundles/netbeans-8.2-linux.sh
 #chmod +x netbeans-8.2-linux.sh
 #./netbeans-8.2-linux.sh --javahome /usr/lib/jvm/java-8-oracle 
