@@ -242,6 +242,31 @@ if [ ! -d "/home/vagrant/mydocker" ]; then
 	cd /home/vagrant
 fi
 
+echo "Installing hadoop 2.7.3 standalone"
+wget http://www-eu.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz && \
+    tar -xzvf hadoop-2.7.3.tar.gz && \
+   sudo  mv hadoop-2.7.3 /usr/local/hadoop && \
+    sudo rm hadoop-2.7.3.tar.gz
+
+export HADOOP_HOME=/usr/local/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+
+echo "Making ssh localhost passwordless for pseudodistributed mode, testing it by : ssh localhost"
+ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+echo "Add pseudodistributed configuration"
+mkdir -p /home/vagrant/config
+
+cp -r $HADOOP_HOME/etc/hadoop  /home/vagrant/config
+#copy config files 
+cp -r /vagrant/hadoopConfig/. /home/vagrant/config/hadoop/
+
+export HADOOP_CONF_DIR=/home/vagrant/config/Hadoop
+
+
+
+
 
 echo "Sucecessfully Finished provisioning of vagrant."
 echo "vagrant ssh to start using."
