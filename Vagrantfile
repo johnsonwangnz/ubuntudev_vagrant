@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
   # using a specific IP.
   # config.vm.network "private_network", ip: "192.168.33.10"
   # config.vm.network "public_network", ip: "192.168.56.2"
-   config.vm.network "public_network", bridge: 'vmxnet3 Ethernet Adapter'
+   config.vm.network "public_network", use_dhcp_assigned_default_route: true
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
@@ -71,4 +71,5 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
   config.vm.provision "shell", path: "provision.sh"
+ 
 end

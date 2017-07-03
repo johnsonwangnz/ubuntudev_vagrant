@@ -19,10 +19,6 @@ echo "Create apps folder under home for all installed apps"
 sudo mkdir -p /home/apps
 sudo chmod -R 777 /home/apps
 
-echo "Prepare environment variables"
-source ~/.bashrc && [ -z "$SPARK_HOME" ] && echo "export SPARK_HOME=/usr/local/spark" >> ~/.bashrc
-
-
 echo "To remove libreoffice apps:"
 
 sudo apt-get remove -y --purge libreoffice*
@@ -199,18 +195,6 @@ echo "Install docker-compose"
 echo "Verify : docker-compose --version"
 sudo pip install docker-compose 
 
-#install spark
-echo "Checking spark folder..."
-if [ ! -d "/usr/local/spark" ]; then
-	echo "Install spark-2.1.0"
-	wget http://d3kbcqa49mib13.cloudfront.net/spark-2.1.0-bin-hadoop2.7.tgz
-	tar -xzvf  spark-2.1.0-bin-hadoop2.7.tgz
-	sudo mv spark-2.1.0-bin-hadoop2.7 /usr/local/spark
-	rm spark-2.1.0-bin-hadoop2.7.tgz
-fi
-
-
-
 # Add hadoop hosts names to local hosts
 if ! grep -q "hadoop-master" /etc/hosts 
 then
@@ -226,12 +210,6 @@ if ! grep -q "hadoop-slave2" /etc/hosts
 then
 	echo '172.18.0.4 hadoop-slave2' | sudo tee --append /etc/hosts
 fi
-
-
-#Fix docker compose build error:  module object has no attribute connection
-echo "Do following to avoid docker compose build error:  module object has no attribute connection"
-sudo pip install --upgrade pip && pip install -U urllib3
-
 echo "Checking mydocker folder..."
 if [ ! -d "/home/vagrant/mydocker" ]; then
 	#Get big data dev docker files
@@ -242,35 +220,8 @@ if [ ! -d "/home/vagrant/mydocker" ]; then
 	cd /home/vagrant
 fi
 
-echo "Installing hadoop 2.7.3 standalone"
-wget http://www-eu.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz && \
-    tar -xzvf hadoop-2.7.3.tar.gz && \
-   sudo  mv hadoop-2.7.3 /usr/local/hadoop && \
-    sudo rm hadoop-2.7.3.tar.gz
-
-export HADOOP_HOME=/usr/local/hadoop
-export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
-
-echo "Making ssh localhost passwordless for pseudodistributed mode, testing it by : ssh localhost"
-ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-
-echo "Add pseudodistributed configuration"
-mkdir -p /home/vagrant/config
-
-cp -r $HADOOP_HOME/etc/hadoop  /home/vagrant/config
-#copy config files 
-cp -r /vagrant/hadoopConfig/. /home/vagrant/config/hadoop/
-
-export HADOOP_CONF_DIR=/home/vagrant/config/Hadoop
-
-
-
-
-
 echo "Sucecessfully Finished provisioning of vagrant."
 echo "vagrant ssh to start using."
-
 
 
 
